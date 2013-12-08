@@ -12,7 +12,9 @@ Using an Arduino Mega 2560, a Seeed Studio ethernet shield, various input mechan
 
 Algorithm
 =========
-
+1. First ordered list item
+2. Another item
+⋅⋅* Unordered sub-list.
 1. Check inputs
 .1. Microphone
 .1. Push button (user trigger)
