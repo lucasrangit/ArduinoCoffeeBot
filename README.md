@@ -14,10 +14,10 @@ Algorithm
 =========
 
 - Check inputs
--- Microphone
--- Push button (user trigger)
--- Pressure
--- Light
+.- Microphone
+.- Push button (user trigger)
+.- Pressure
+.- Light
 - If coffee is ready
--- Send "Coffee is ready in room -1-2010."
+.- Send "Coffee is ready in room -1-2010."
 
