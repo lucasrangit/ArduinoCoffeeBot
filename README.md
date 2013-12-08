@@ -3,7 +3,7 @@ ArduinoCoffeeBot
 
 CoffeeBot will notify you when coffee is ready.
 
-Follow https://twitter.com/0xc0ffeebad to get notification when coffee is ready. Use the location # as a hashtag to filter results based on your location.
+Follow https://twitter.com/0xc0ffeebad to get notification when coffee is ready. Use the location - as a hashtag to filter results based on your location.
 
 Prototype
 =========
@@ -13,11 +13,11 @@ Using an Arduino Mega 2560, a Seeed Studio ethernet shield, various input mechan
 Algorithm
 =========
 
-# Check inputs
-## Microphone
-## Push button (user trigger)
-## Pressure
-## Light
-# If coffee is ready
-## Send "Coffee is ready in room #1-2010."
+- Check inputs
+-- Microphone
+-- Push button (user trigger)
+-- Pressure
+-- Light
+- If coffee is ready
+-- Send "Coffee is ready in room -1-2010."
 
