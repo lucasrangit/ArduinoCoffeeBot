@@ -12,14 +12,11 @@ Using an Arduino Mega 2560, a Seeed Studio ethernet shield, various input mechan
 
 Algorithm
 =========
-1. First ordered list item
-2. Another item
-⋅⋅* Unordered sub-list.
-1. Check inputs
-.1. Microphone
-.1. Push button (user trigger)
-.1. Pressure
-.1. Light
-1. If coffee is ready
-.1. Send "Coffee is ready in room -1-2010."
+- Check inputs
+ - Microphone
+ - Push button (user trigger)
+ - Pressure
+ - Light
+- If coffee is ready
+ - Send "Coffee is ready in room -1-2010."
 
