@@ -28,6 +28,16 @@ Twitter twitter("123456789-abcdefghijklmnopqrstuvwxyz");
 long tweet_delay_ms = 1000;
 char message[139] = { '\0' };
 
+// Push Button Settings
+const int BUTTON = 22;
+
+bool check_button() {
+  if (digitalRead(BUTTON) == HIGH) 
+    return true;
+  else 
+    return false; 
+}
+
 void fill_tweet(char msg[]) {
   static int previous_tweet = 0;
   //static long last_tweet_time = millis();
@@ -82,11 +92,12 @@ void setup() {
     Serial.println(Ethernet.localIP());
     ethernet_up = true;
   }
+  
+  // Configure Push Button
+  pinMode(BUTTON, INPUT);
 }
 
 void loop() {
-  bool coffee = false;
-  
   if (Serial.available() > 0) {
     Serial.read(); // remove byte from Rx FIFO
     Serial.print("Hi, I am Arduino CoffeeBot #");
@@ -96,10 +107,8 @@ void loop() {
   }
   
   // Check inputs
-  
-  
-  // Report status
-  if (coffee) {
+  if (check_button()) {
+    // Report status
     Serial.print("Coffee was detected at "); 
     Serial.println(millis());
     sprintf(message, "Coffee at #%i", id); 
