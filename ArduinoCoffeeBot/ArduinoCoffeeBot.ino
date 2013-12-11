@@ -88,7 +88,7 @@ void loop() {
   bool coffee = false;
   
   if (Serial.available() > 0) {
-    Serial.read();
+    Serial.read(); // remove byte from Rx FIFO
     Serial.print("Hi, I am Arduino CoffeeBot #");
     Serial.println(id);
     Serial.print("IP: ");
