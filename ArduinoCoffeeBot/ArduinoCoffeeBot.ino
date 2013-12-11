@@ -74,6 +74,7 @@ void setup() {
   Serial.println(" bps");
   
   // Configure Ethernet for DHCP
+  Serial.println("Connecting to network...");
   if (Ethernet.begin(mac) == 0)
     Serial.println("Ethernet DCHP configuration failed");  
   else {
@@ -87,6 +88,7 @@ void loop() {
   bool coffee = false;
   
   if (Serial.available() > 0) {
+    Serial.read();
     Serial.print("Hi, I am Arduino CoffeeBot #");
     Serial.println(id);
     Serial.print("IP: ");
