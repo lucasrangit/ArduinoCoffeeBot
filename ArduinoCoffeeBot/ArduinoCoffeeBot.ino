@@ -31,11 +31,40 @@ char message[139] = { '\0' };
 // Push Button Settings
 const int BUTTON = 22;
 
+// Pressure Sensor Settings
+const int PRESSURE = 8; // A8
+const int EMPTY = 10; // Calibrated value of empty
+
 bool check_button() {
   if (digitalRead(BUTTON) == HIGH) 
     return true;
   else 
     return false; 
+}
+
+/*
+ * If the pressure sensor reaches the FULL threshold and maintains it for n 
+ */
+bool check_pressure() {
+  static int past[10] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+  static int sample = 0;
+  int current = analogRead(PRESSURE);
+  int i = 0;
+  
+  Serial.print("past[");
+  Serial.print(sample);
+  Serial.print("] = ");
+  Serial.println(current);
+  
+  // save
+  past[sample] = current;
+  
+  // check last 10
+  
+  // increment index
+  sample = sample++ % 10;
+  
+  return false;
 }
 
 void fill_tweet(char msg[]) {
@@ -95,6 +124,11 @@ void setup() {
   
   // Configure Push Button
   pinMode(BUTTON, INPUT);
+  
+  // Configure Pressure Sensor
+  /* analog inputs are inputs by default
+  pinMode(PRESSURE, INPUT);
+  */
 }
 
 void loop() {
@@ -107,7 +141,7 @@ void loop() {
   }
   
   // Check inputs
-  if (check_button()) {
+  if (check_button() || check_pressure()) {
     // Report status
     Serial.print("Coffee was detected at "); 
     Serial.println(millis());
