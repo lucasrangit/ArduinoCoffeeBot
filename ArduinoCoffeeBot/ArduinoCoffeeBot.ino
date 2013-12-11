@@ -34,6 +34,7 @@ const int BUTTON = 22;
 // Pressure Sensor Settings
 const int PRESSURE = 8; // A8
 const int EMPTY = 10; // Calibrated value of empty
+const int FULL = 128; // Calibrated value of full
 
 bool check_button() {
   if (digitalRead(BUTTON) == HIGH) 
@@ -43,28 +44,34 @@ bool check_button() {
 }
 
 /*
- * If the pressure sensor reaches the FULL threshold and maintains it for n 
+ * If the pressure sensor reaches the FULL threshold and maintains it for n samples
  */
 bool check_pressure() {
-  static int past[10] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-  static int sample = 0;
   int current = analogRead(PRESSURE);
-  int i = 0;
-  
-  Serial.print("past[");
-  Serial.print(sample);
-  Serial.print("] = ");
+  static int full_count = 0;
+
+  // debug monitor
+  #if 0
+  Serial.print("Pressure ADC = ");
   Serial.println(current);
+  #endif 
   
-  // save
-  past[sample] = current;
+  if (current < EMPTY) {
+    full_count = 0;
+    return false;
+  }
   
-  // check last 10
+  if (current < FULL) {
+    full_count = 0;
+    return false; 
+  }
+    
+  if (full_count++ < 10) {
+    return false;
+  }
   
-  // increment index
-  sample = sample++ % 10;
-  
-  return false;
+  full_count = 0;
+  return true;
 }
 
 void fill_tweet(char msg[]) {
@@ -113,6 +120,7 @@ void setup() {
   Serial.println(" bps");
   
   // Configure Ethernet for DHCP
+  #if 0
   Serial.println("Connecting to network...");
   if (Ethernet.begin(mac) == 0)
     Serial.println("Ethernet DCHP configuration failed");  
@@ -121,6 +129,7 @@ void setup() {
     Serial.println(Ethernet.localIP());
     ethernet_up = true;
   }
+  #endif
   
   // Configure Push Button
   pinMode(BUTTON, INPUT);
