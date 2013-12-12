@@ -74,22 +74,24 @@ bool check_pressure() {
   return true;
 }
 
-void fill_tweet(char msg[]) {
+void create_tweet(char msg[]) {
   static int previous_tweet = 0;
-  //static long last_tweet_time = millis();
-  //long time = millis();
+
+  // TODO detect night and reset to 0
 
   // Must use a different message each time because Twitter will block duplicate posts.  
   switch (previous_tweet++) {
     case (0):
-      sprintf(msg, "CoffeeBot 0x%X: First brew of the day ready in %s.", id, location);
+      sprintf(msg, "CoffeeBot 0x%02X: First brew of the day ready in #%s.", id, location);
+      break;
     case (1):
-      sprintf(msg, "CoffeeBot 0x%X: Coffee is ready in %s.", id, location); 
+      sprintf(msg, "CoffeeBot 0x%02X: Coffee is ready in #%s.", id, location); 
       break;   
     case (2):
-      sprintf(msg, "CoffeeBot 0x%X, Coffee in %s is ready.", id, location);
+      sprintf(msg, "CoffeeBot 0x%02X, Coffee in #%s is ready.", id, location);
       break;
     default:
+      sprintf(msg, "CoffeeBot 0x%02X, Coffee in #%s! Come and get it!", id, location);
       previous_tweet = 1;
   }
   
@@ -154,8 +156,12 @@ void loop() {
     // Report status
     Serial.print("Coffee was detected at "); 
     Serial.println(millis());
-    sprintf(message, "Coffee at #%i", id); 
-    
+    //sprintf(message, "Coffee at #%i", id); 
+    create_tweet(message);
+    if (ethernet_up)
+      tweet(message);
+    else
+      Serial.println(message);
   }
   
   // Temporary until everything is wired up to avoid excessive processing
