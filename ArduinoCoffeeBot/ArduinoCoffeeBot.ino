@@ -1,6 +1,6 @@
 // SPI Support
 #include <SPI.h>
-// Ethernet Shield Support
+// Ethernet Shield Sup]port
 #include <Dhcp.h>
 #include <Dns.h>
 #include <EthernetClient.h>
@@ -44,19 +44,34 @@ bool check_button() {
 }
 
 /*
- * If the pressure sensor reaches the FULL threshold and maintains it for n samples
+ * Detect that the coffee pot is full by looking for a stable rate of change.
  */
 bool check_pressure() {
-  int current = analogRead(PRESSURE);
   static int full_count = 0;
+  static int previous = 0;
+  int current = analogRead(PRESSURE);
+  int difference = current - previous;
 
   // debug monitor
   #if 1
-  Serial.print("Pressure ADC = ");
-  Serial.println(current);
+  Serial.print("Pressure ");
+  Serial.print(previous);
+  Serial.print(" -> ");
+  Serial.print(current);
+  Serial.print(" difference ");
+  Serial.print(difference);
+  Serial.print(" count ");
+  Serial.println(full_count);
   #endif 
   
+  previous = current;
+  
   if (current < EMPTY) {
+    full_count = 0;
+    return false;
+  }
+
+  if (abs(difference) > 10) {
     full_count = 0;
     return false;
   }
