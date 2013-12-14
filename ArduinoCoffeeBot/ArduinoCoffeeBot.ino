@@ -25,7 +25,7 @@ bool ethernet_up = false;
 
 // Twitter Settings
 Twitter twitter("123456789-abcdefghijklmnopqrstuvwxyz");
-long tweet_delay_ms = 1000;
+unsigned long tweet_delay_ms = 1*60*1000;
 char message[139] = { '\0' };
 
 // Push Button Settings
@@ -34,7 +34,7 @@ const int BUTTON = 22;
 // Pressure Sensor Settings
 const int PRESSURE = 8; // A8
 const int EMPTY = 10; // Calibrated value of empty
-const int FULL = 128; // Calibrated value of full
+const int FULL = 50; // Calibrated value of full
 
 bool check_button() {
   if (digitalRead(BUTTON) == HIGH) 
@@ -51,7 +51,7 @@ bool check_pressure() {
   static int full_count = 0;
 
   // debug monitor
-  #if 0
+  #if 1
   Serial.print("Pressure ADC = ");
   Serial.println(current);
   #endif 
@@ -66,7 +66,7 @@ bool check_pressure() {
     return false; 
   }
     
-  if (full_count++ < 10) {
+  if (full_count++ < 5) {
     return false;
   }
   
@@ -99,12 +99,27 @@ void create_tweet(char msg[]) {
   msg[139] = '\0';
 }
 
-void tweet(char msg[]) {
+// Send message to Twitter. Don't send if minimum delay has not been met.
+// Return True if message was sent successfully.
+bool tweet(char msg[]) {
+  static unsigned long next_tweet_ms = 0;
+  bool sent = false;
+  
+  Serial.println(next_tweet_ms);
+  
+  if (millis() < next_tweet_ms) {
+    Serial.print("Tweets blocked for ");
+    Serial.print((next_tweet_ms - millis())/1000);
+    Serial.println(" seconds.");  
+    return false;
+  }
+  
   Serial.println("connecting ...");
   if (twitter.post(msg)) {
     int status = twitter.wait(&Serial);
     if (status == 200) {
       Serial.println("OK.");
+      sent = true;
     } else {
       Serial.print("failed : code ");
       Serial.println(status);
@@ -112,6 +127,11 @@ void tweet(char msg[]) {
   } else {
     Serial.println("connection failed.");
   }
+  
+  if (sent || !ethernet_up)
+    next_tweet_ms = millis() + tweet_delay_ms; // handles rollover
+  
+  return sent;
 }
 
 void setup() {
@@ -164,6 +184,5 @@ void loop() {
       Serial.println(message);
   }
   
-  // Temporary until everything is wired up to avoid excessive processing
-  delay(tweet_delay_ms);
+  delay(1000);
 }
