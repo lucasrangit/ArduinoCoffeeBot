@@ -32,9 +32,9 @@ char message[139] = { '\0' };
 const int BUTTON = 22;
 
 // Pressure Sensor Settings
-const int PRESSURE = 8; // A8
-const int EMPTY = 10; // Calibrated value of empty
-const int FULL = 50; // Calibrated value of full
+const int PRESSURE = 8; // Pin A8
+const int EMPTY = 250; // Experimentally calibrated
+const int FULL = 400; // Experimentally calibrated
 
 bool check_button() {
   if (digitalRead(BUTTON) == HIGH) 
@@ -45,10 +45,12 @@ bool check_button() {
 
 /*
  * Detect that the coffee pot is full by looking for a stable rate of change.
+ * Reset when the coffee pot is empty.
  */
 bool check_pressure() {
   static int full_count = 0;
   static int previous = 0;
+  static bool full = false;
   int current = analogRead(PRESSURE);
   int difference = current - previous;
 
@@ -65,13 +67,18 @@ bool check_pressure() {
   #endif 
   
   previous = current;
-  
+    
   if (current < EMPTY) {
     full_count = 0;
+    full = false;
     return false;
   }
+  
+  if (full) {
+    return false; 
+  }
 
-  if (abs(difference) > 10) {
+  if (abs(difference) > 3) {
     full_count = 0;
     return false;
   }
@@ -81,11 +88,12 @@ bool check_pressure() {
     return false; 
   }
     
-  if (full_count++ < 5) {
+  if (full_count++ < 3) {
     return false;
   }
   
   full_count = 0;
+  full = true;
   return true;
 }
 
@@ -179,7 +187,7 @@ void setup() {
 
 void loop() {
   if (Serial.available() > 0) {
-    Serial.read(); // remove byte from Rx FIFO
+    while (Serial.read() != -1) {}; // flush Rx FIFO
     Serial.print("Hi, I am Arduino CoffeeBot #");
     Serial.println(id);
     Serial.print("IP: ");
@@ -189,9 +197,8 @@ void loop() {
   // Check inputs
   if (check_button() || check_pressure()) {
     // Report status
-    Serial.print("Coffee was detected at "); 
+    Serial.print("Coffee detected at "); 
     Serial.println(millis());
-    //sprintf(message, "Coffee at #%i", id); 
     create_tweet(message);
     if (ethernet_up)
       tweet(message);
@@ -199,5 +206,5 @@ void loop() {
       Serial.println(message);
   }
   
-  delay(1000);
+  delay(10*1000);
 }
